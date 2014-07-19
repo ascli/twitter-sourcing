@@ -1,0 +1,12 @@
+nytimes
+washingtonpost
+wsj
+ap
+npr
+propublica
+newyorker
+cbsnews
+bbcnews
+guardian
+usatoday
+bozchron

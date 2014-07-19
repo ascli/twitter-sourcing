@@ -20,10 +20,10 @@ To follow along:
 
 - __Authenticate with Twitter__ by making a test app and getting an access token: The [t gem documentation can walk you through the configuration](https://github.com/sferik/t#configuration). You can create an app with __read-only__ access for now.
 
-- __Make two sub-directories__ to keep things a little more organized, named `source-files` and `twitter-data`
+- __Make two sub-directories__ to keep things a little more organized, named `drafts` and `working`, to store test results and useful results, respectively:  
     ```sh
-    mkdir my-drafts
-    mkdir my-data
+    mkdir drafts
+    mkdir working
     ```
 
 
@@ -150,9 +150,80 @@ Saving files, re-opening files, re-saving them...It seems very clunky, like old-
 For now, you'll hopefully find that the command-line is so fast that you'll have more than enough data and ways to slice and dice it to keep you occupied.
 
 
-## Working with input files
+## Working with batches
+
+### Fetch multiple users at once
+
+Let's speed up our work. Many of the `t` commands can take multiple _arguments_ (e.g. values) and process them as a batch. 
+
+Instead of fetching and saving data for 3 users, one at a time, like this:
+
+```
+t whois --csv nytimes > drafts/whois-nytimes.csv
+t whois --csv washingtonpost > drafts/whois-washingtonpost.csv
+t whois --csv wsj > drafts/whois-wsj.csv
+```
+
+We can use the `users` command, which fetches the same user data, but for multiple users at a time:
+
+```
+t users --csv nytimes washingtonpost wsj > drafts/users-newspapers.csv
+```
+
+Instead of 3 spreadsheets each with 1 data row (plus the top row for column headers), we now have 1 spreadsheet with 3 rows (plus the headers): [drafts/users-newspapers.csv](drafts/users-newspapers.csv)
+
+
+### Read from an existing list of names
+
+Let's speed up things even more. Let's say we already have a list of Twitter usernames in a textfile, one per line like this:
+
+```
+nytimes
+washingtonpost
+wsj
+ap
+npr
+propublica
+newyorker
+cbsnews
+bbcnews
+guardian
+usatoday
+bozchron
+```
+
+It's not time-consuming to just hand-type those into the `users` command. But we should figure out how to get the computer to do that repetitive (and error-prone) _for us_, just in case in the near future, we need to do it for hundreds or _thousands_ of usernames.
+
+For testing purposes, we'll do a little manually work: highlight the list above, copy and paste it into a file named `drafts/news-orgs.txt`
+
+If you use the UNIX `cat` command, you should see the list outputted to your Terminal screen:
+
+```sh
+cat drafts/news-orgs.txt
+```
+
+So what we need to do is, instead of printing that list to screen, _piping_ those usernames to be used as _arguments_ to the `t users` command. 
+
+So, using UNIX's `xargs` command:
+
+```sh
+cat drafts/news-orgs.txt | xargs t users --csv > drafts/users-news-orgs.csv
+```
+
+Take a look at `drafts/users-news-orgs.csv` and you should have a data for a dozen news organizations.
+
+
+Taking the contents of one file and piping it into a command is basically the main computing "superpower" that we'll use throughout the rest of this exercise. It may not seem like much now, but think how long it would've taken you to look up those 12 Twitter accounts with your web browser, nevermind copy and paste their data, by hand into a spreadsheet. 
+
+But now that we've processed the data for 12 accounts from the command-line, we know how to do it for 120 or 12000 such accounts, because it's the exact same syntax. The only thing that's holding us back is...where do we get a meaningfully large list of usernames to send via `xargs`, without typing them in by hand?
+
+First, a detour in some data filtering. 
 
 ## Parsing structured data
 
-(and so forth)
+### Hello CSVkit
 
+- `csvlook`
+
+
+### One column at a time with `csvcut`
